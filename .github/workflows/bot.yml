@@ -1,0 +1,34 @@
+name: Run NFT Bot
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Write .env from GitHub Secrets
+      run: |
+        echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> .env
+        echo "GITHUB_TOKEN=${{ secrets.MY_TOKEN }}" >> .env
+        echo "GITHUB_REPO=Bedeeuu/MY-REPO" >> .env
+        echo "HF_TOKEN=${{ secrets.HF_TOKEN }}" >> .env
+        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+
+    - name: Run bot
+      run: python bot_main.py
