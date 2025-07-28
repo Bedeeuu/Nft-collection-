@@ -81,9 +81,27 @@ async def ask_vlm(image_url: str, question: str) -> str:
             return f"[Error {resp.status}] {await resp.text()}"
 
 # ─── Command: /start ──────────────────────────────────
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
-    await message.answer("📸 Отправь изображение — и я создам описание.\n\n🧠 /ask [вопрос] — спросить про фото\n🔁 /rebuild — заново описать\n🌐 /caption <url> — описание по ссылке\n🪙 /mint — сохранить в IPFS")
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📤 Загрузить изображение", switch_inline_query_current_chat="")],
+        [InlineKeyboardButton(text="🌐 Описание по ссылке", switch_inline_query_current_chat="/caption ")],
+        [InlineKeyboardButton(text="🪙 Минт NFT", callback_data="mint_info")]
+    ])
+
+    await message.answer(
+        "👋 Добро пожаловать!\n\n"
+        "📸 Отправь мне изображение — и я создам описание через AI.\n\n"
+        "🧠 Можешь также:\n"
+        "• Задать вопрос → /ask [вопрос]\n"
+        "• Повторить описание → /rebuild\n"
+        "• Сгенерировать по ссылке → /caption <url>\n"
+        "• Минт в IPFS → /mint\n",
+        reply_markup=keyboard
+    )
+
 
 # ─── Command: /ask ────────────────────────────────────
 @dp.message(Command("ask"))
