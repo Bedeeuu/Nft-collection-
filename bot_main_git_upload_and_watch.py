@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO)
 # ─── ENV ───────────────────────────────────────────
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 GITHUB_TOKEN   = os.getenv("MY_TOKEN")
-GITHUB_REPO    = os.getenv("GITHUB_REPO")
+GITHUB_REPO    = os.getenv("MY_REPO")
 BRANCH         = os.getenv("GITHUB_BRANCH", "main")
 IMG_DIR        = os.getenv("GITHUB_PATH_IMG", "images")
 DESC_DIR       = os.getenv("GITHUB_PATH_DESC", "description")
