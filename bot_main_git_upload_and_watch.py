@@ -11,6 +11,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters import Command
 from dotenv import load_dotenv
 from uuid import uuid4
+from base64 import b64encode, b64decode
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +23,7 @@ GITHUB_REPO    = os.getenv("MY_REPO")
 BRANCH         = os.getenv("GITHUB_BRANCH", "main")
 IMG_DIR        = os.getenv("GITHUB_PATH_IMG", "images")
 DESC_DIR       = os.getenv("GITHUB_PATH_DESC", "description")
+HF_TOKEN       = os.getenv("HF_TOKEN")  # 🔑 HuggingFace API token
 
 HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
@@ -35,7 +37,6 @@ user_cache = {}  # {user_id: {"image": ..., "base": ...}}
 
 # ─── UPLOAD TO GITHUB ──────────────────────────────
 async def upload_to_github(filename: str, data: bytes, path: str):
-    from base64 import b64encode
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{path}"
     payload = {
         "message": f"Upload {filename}",
@@ -58,28 +59,52 @@ async def wait_for_json(user_id: int, base_name: str, timeout=60):
                 if resp.status == 200:
                     data = await resp.json()
                     content = data["content"]
-                    import base64
-                    json_str = base64.b64decode(content).decode("utf-8")
+                    json_str = b64decode(content).decode("utf-8")
                     return json.loads(json_str)
     return None
 
-# ─── COMMANDS ──────────────────────────────────────
+# ─── START ─────────────────────────────────────────
 @dp.message(Command("start"))
 async def start(message: types.Message):
-    await message.answer("👋 Отправь изображение, и я сгенерирую описание NFT через GitHub!")
+    await message.answer("👋 Отправь изображение, и я сгенерирую описание NFT через GitHub!\n💬 После можешь задать вопрос через /ask")
 
+# ─── ASK ───────────────────────────────────────────
 @dp.message(Command("ask"))
 async def ask(message: types.Message):
     user_id = message.from_user.id
     if user_id not in user_cache:
-        return await message.answer("⚠️ Нет загруженного изображения.")
+        return await message.answer("⚠️ Сначала отправь изображение.")
+    
     question = message.text.replace("/ask", "").strip()
     if not question:
         return await message.answer("✍️ Добавь вопрос после /ask.")
-    img_url = user_cache[user_id]["image"]
+    
+    image_url = user_cache[user_id]["image"]
 
-    # вызов HuggingFace VLM через API (placeholder)
-    await message.answer(f"🤖 (псевдоответ) AI думает над вопросом: «{question}» по изображению:\n{img_url}")
+    payload = [{
+        "role": "user",
+        "content": [
+            {"type": "image", "url": image_url},
+            {"type": "text", "text": question}
+        ]
+    }]
+
+    hf_url = "https://api-inference.huggingface.co/models/HuggingFaceTB/SmolVLM-Instruct"
+    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(hf_url, headers=headers, json=payload) as resp:
+                if resp.status == 200:
+                    result = await resp.json()
+                    reply = result[0]["generated_text"]
+                else:
+                    text = await resp.text()
+                    reply = f"❌ Ошибка HuggingFace: {resp.status}\n{text}"
+    except Exception as e:
+        reply = f"❌ Ошибка запроса: {e}"
+
+    await message.answer(f"🤖 <b>Ответ:</b>\n{reply}")
 
 # ─── IMAGE HANDLER ─────────────────────────────────
 @dp.message(F.photo | F.document)
@@ -95,12 +120,4 @@ async def handle_photo(message: types.Message):
     with open(path, "rb") as f:
         raw = f.read()
 
-    success = await upload_to_github(filename, raw, f"{IMG_DIR}/{filename}")
-    if not success:
-        return await message.answer("❌ Не удалось загрузить изображение в GitHub.")
-
-    await message.answer("📤 Загружено в GitHub. Жду описание...")
-
-    data = await wait_for_json(message.from_user.id, base_name)
-    if not data:
-        return await message.answer("⚠️ Не удалось получить описание. Попробуй позж
+    success = await upload_to_github(filename, raw, f
