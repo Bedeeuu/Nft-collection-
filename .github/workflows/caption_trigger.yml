@@ -1,0 +1,38 @@
+name: Generate NFT Caption
+
+on:
+  push:
+    paths:
+      - "images/**.jpg"
+      - "images/**.png"
+      - "images/**.jpeg"
+
+jobs:
+  caption:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install requirements
+      run: |
+        pip install -r requirements.txt
+
+    - name: Generate caption JSON
+      run: |
+        python generate_caption.py
+
+    - name: Commit generated descriptions
+      run: |
+        git config user.name "NFT-AutoBot"
+        git config user.email "bot@example.com"
+        git add description/*.json
+        git commit -m "🤖 Add auto-generated description"
+        git push
+      continue-on-error: true
