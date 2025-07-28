@@ -4,38 +4,39 @@ import time
 import aiohttp
 import logging
 import asyncio
+from uuid import uuid4
+from base64 import b64encode, b64decode
+
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters import Command
 from dotenv import load_dotenv
-from uuid import uuid4
-from base64 import b64encode, b64decode
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-# ─── ENV ───────────────────────────────────────────
+# ─── ENV ───────────────────────────────────────────────
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 GITHUB_TOKEN   = os.getenv("MY_TOKEN")
 GITHUB_REPO    = os.getenv("MY_REPO")
 BRANCH         = os.getenv("GITHUB_BRANCH", "main")
 IMG_DIR        = os.getenv("GITHUB_PATH_IMG", "images")
 DESC_DIR       = os.getenv("GITHUB_PATH_DESC", "description")
-HF_TOKEN       = os.getenv("HF_TOKEN")  # 🔑 HuggingFace API token
+HF_TOKEN       = os.getenv("HF_TOKEN")
+NFT_STORAGE_KEY = os.getenv("NFT_STORAGE_KEY")
+
+# ─── INIT ──────────────────────────────────────────────
+bot = Bot(token=TELEGRAM_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+dp = Dispatcher(storage=MemoryStorage())
+user_cache = {}  # user_id: {"image": ..., "base": ..., "ext": ...}
 
 HEADERS = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json"
 }
-
-# ─── INIT ──────────────────────────────────────────
-bot = Bot(token=TELEGRAM_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher(storage=MemoryStorage())
-user_cache = {}  # {user_id: {"image": ..., "base": ...}}
-
-# ─── UPLOAD TO GITHUB ──────────────────────────────
+# ─── GitHub upload ─────────────────────────────────────
 async def upload_to_github(filename: str, data: bytes, path: str):
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{path}"
     payload = {
@@ -47,7 +48,7 @@ async def upload_to_github(filename: str, data: bytes, path: str):
         async with session.put(url, headers=HEADERS, json=payload) as resp:
             return resp.status in [201, 200]
 
-# ─── WATCH FOR JSON ────────────────────────────────
+# ─── Wait for JSON ─────────────────────────────────────
 async def wait_for_json(user_id: int, base_name: str, timeout=60):
     json_path = f"{DESC_DIR}/{base_name}.json"
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{json_path}?ref={BRANCH}"
@@ -59,28 +60,11 @@ async def wait_for_json(user_id: int, base_name: str, timeout=60):
                 if resp.status == 200:
                     data = await resp.json()
                     content = data["content"]
-                    json_str = b64decode(content).decode("utf-8")
-                    return json.loads(json_str)
+                    return json.loads(b64decode(content).decode("utf-8"))
     return None
 
-# ─── START ─────────────────────────────────────────
-@dp.message(Command("start"))
-async def start(message: types.Message):
-    await message.answer("👋 Отправь изображение, и я сгенерирую описание NFT через GitHub!\n💬 После можешь задать вопрос через /ask")
-
-# ─── ASK ───────────────────────────────────────────
-@dp.message(Command("ask"))
-async def ask(message: types.Message):
-    user_id = message.from_user.id
-    if user_id not in user_cache:
-        return await message.answer("⚠️ Сначала отправь изображение.")
-    
-    question = message.text.replace("/ask", "").strip()
-    if not question:
-        return await message.answer("✍️ Добавь вопрос после /ask.")
-    
-    image_url = user_cache[user_id]["image"]
-
+# ─── HuggingFace call ─────────────────────────────────
+async def ask_vlm(image_url: str, question: str) -> str:
     payload = [{
         "role": "user",
         "content": [
@@ -88,25 +72,89 @@ async def ask(message: types.Message):
             {"type": "text", "text": question}
         ]
     }]
-
-    hf_url = "https://api-inference.huggingface.co/models/HuggingFaceTB/SmolVLM-Instruct"
     headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+    async with aiohttp.ClientSession() as session:
+        async with session.post("https://api-inference.huggingface.co/models/HuggingFaceTB/SmolVLM-Instruct", headers=headers, json=payload) as resp:
+            if resp.status == 200:
+                result = await resp.json()
+                return result[0]["generated_text"]
+            return f"[Error {resp.status}] {await resp.text()}"
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(hf_url, headers=headers, json=payload) as resp:
-                if resp.status == 200:
-                    result = await resp.json()
-                    reply = result[0]["generated_text"]
-                else:
-                    text = await resp.text()
-                    reply = f"❌ Ошибка HuggingFace: {resp.status}\n{text}"
-    except Exception as e:
-        reply = f"❌ Ошибка запроса: {e}"
+# ─── Command: /start ──────────────────────────────────
+@dp.message(Command("start"))
+async def cmd_start(message: types.Message):
+    await message.answer("📸 Отправь изображение — и я создам описание.\n\n🧠 /ask [вопрос] — спросить про фото\n🔁 /rebuild — заново описать\n🌐 /caption <url> — описание по ссылке\n🪙 /mint — сохранить в IPFS")
 
+# ─── Command: /ask ────────────────────────────────────
+@dp.message(Command("ask"))
+async def cmd_ask(message: types.Message):
+    q = message.text.replace("/ask", "").strip()
+    if message.from_user.id not in user_cache:
+        return await message.answer("⚠️ Сначала отправь изображение.")
+    if not q:
+        return await message.answer("✍️ Добавь вопрос после /ask.")
+    img_url = user_cache[message.from_user.id]["image"]
+    reply = await ask_vlm(img_url, q)
     await message.answer(f"🤖 <b>Ответ:</b>\n{reply}")
 
-# ─── IMAGE HANDLER ─────────────────────────────────
+# ─── Command: /caption <url> ──────────────────────────
+@dp.message(Command("caption"))
+async def cmd_caption(message: types.Message):
+    url = message.text.replace("/caption", "").strip()
+    if not url:
+        return await message.answer("⚠️ Укажи ссылку: /caption https://...")
+
+    q = "Опиши это изображение подробно, включая эмоциональный тон."
+    reply = await ask_vlm(url, q)
+    await message.answer(f"🧠 Описание:\n{reply}")
+
+# ─── Command: /rebuild ────────────────────────────────
+@dp.message(Command("rebuild"))
+async def cmd_rebuild(message: types.Message):
+    uid = message.from_user.id
+    if uid not in user_cache:
+        return await message.answer("⚠️ Нет предыдущего изображения.")
+    url = user_cache[uid]["image"]
+    q = "Сгенерируй новое поэтичное описание изображения."
+    result = await ask_vlm(url, q)
+    await message.answer(f"🔁 Новое описание:\n{result}")
+
+# ─── Command: /mint ───────────────────────────────────
+@dp.message(Command("mint"))
+async def cmd_mint(message: types.Message):
+    uid = message.from_user.id
+    if uid not in user_cache:
+        return await message.answer("⚠️ Сначала отправь изображение.")
+
+    name = user_cache[uid]["base"]
+    ext  = user_cache[uid]["ext"]
+    json_path = f"description/{name}.json"
+    img_path = f"images/{name}{ext}"
+
+    async def read_file_raw(path):
+        url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{path}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                return await resp.read()
+
+    json_bytes = await read_file_raw(json_path)
+    img_bytes  = await read_file_raw(img_path)
+
+    async with aiohttp.ClientSession() as session:
+        for content, filename in [(img_bytes, f"{name}{ext}"), (json_bytes, f"{name}.json")]:
+            form = aiohttp.FormData()
+            form.add_field("file", content, filename=filename, content_type="application/octet-stream")
+            async with session.post("https://api.nft.storage/upload", data=form, headers={
+                "Authorization": f"Bearer {NFT_STORAGE_KEY}"
+            }) as resp:
+                if resp.status == 200:
+                    r = await resp.json()
+                    cid = r['value']['cid']
+                    await message.answer(f"🪙 Файл {filename} загружен: https://ipfs.io/ipfs/{cid}")
+                else:
+                    await message.answer(f"❌ Ошибка загрузки {filename}: {resp.status}")
+
+# ─── MEDIA HANDLER (фото) ─────────────────────────────
 @dp.message(F.photo | F.document)
 async def handle_photo(message: types.Message):
     file = message.photo[-1] if message.photo else message.document
@@ -115,9 +163,27 @@ async def handle_photo(message: types.Message):
     base_name = f"NFT_{uuid4().hex[:8]}"
     filename = f"{base_name}{ext}"
     path = f"temp/{filename}"
-
     await bot.download_file(info.file_path, path)
-    with open(path, "rb") as f:
-        raw = f.read()
+    raw = open(path, "rb").read()
 
-    success = await upload_to_github(filename, raw, f
+    uploaded = await upload_to_github(filename, raw, f"{IMG_DIR}/{filename}")
+    if not uploaded:
+        return await message.answer("❌ Ошибка загрузки в GitHub.")
+
+    await message.answer("📤 Жду описание...")
+    data = await wait_for_json(message.from_user.id, base_name)
+    if not data:
+        return await message.answer("⚠️ Не удалось получить описание.")
+
+    user_cache[message.from_user.id] = {
+        "image": data["image"],
+        "base": base_name,
+        "ext": ext
+    }
+
+    await message.answer(f"✅ <b>{data['name']}</b>\n🧠 {data['description']}\n\n💬 Можешь задать вопрос: /ask [вопрос]")
+
+# ─── MAIN ─────────────────────────────────────────────
+if __name__ == "__main__":
+    os.makedirs("temp", exist_ok=True)
+    asyncio.run(dp.start_polling(bot))
