@@ -27,4 +27,11 @@ jobs:
     - name: Write .env from GitHub Secrets
       run: |
         echo "TELEGRAM_TOKEN=${{ secrets.TELEGRAM_TOKEN }}" >> .env
-        echo "MY_TOKEN=${{ secrets.MY_TOKE
+        echo "MY_TOKEN=${{ secrets.MY_TOKEN }}" >> .env
+        echo "MY_REPO=${{ secrets.MY_REPO }}" >> .env
+        echo "GITHUB_BRANCH=main" >> .env
+        echo "GITHUB_PATH_IMG=images" >> .env
+        echo "GITHUB_PATH_DESC=description" >> .env
+
+    - name: Run bot
+      run: python bot_main_git_upload_and_watch.py
