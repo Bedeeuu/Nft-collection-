@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFT Collection</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>NFT Collection</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="image" accept="image/*" required>
+            <input type="text" name="customName" placeholder="Custom Name (optional)">
+            <label>
+                <input type="checkbox" name="generateIPFS"> Generate IPFS Link
+            </label>
+            <button type="submit">Upload Image</button>
+        </form>
+        <div id="response"></div>
+        <h2>Collection Overview</h2>
+        <div id="collection"></div>
+    </div>
+    <script src="js/app.js"></script>
+</body>
+</html>

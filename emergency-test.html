@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emergency Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; }
+        #result { margin-top: 20px; padding: 20px; border: 1px solid #ccc; background: #f9f9f9; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>🚨 Emergency Server Test</h1>
+    <p>Current URL: <span id="currentUrl"></span></p>
+    
+    <h3>Tests:</h3>
+    <button onclick="testHealth()">1. Test Health (/api/health)</button>
+    <button onclick="testCollection()">2. Test Collection (/api/collection)</button>
+    <button onclick="testUpload()">3. Test Upload (/api/upload)</button>
+    <button onclick="testMain()">4. Test Main Page (/)</button>
+    <button onclick="clearResult()">Clear Results</button>
+    
+    <div id="result">
+        <div class="info">Ready to test. Click buttons above.</div>
+    </div>
+
+    <script>
+        document.getElementById('currentUrl').textContent = window.location.href;
+
+        function log(message, type = 'info') {
+            const result = document.getElementById('result');
+            const time = new Date().toLocaleTimeString();
+            result.innerHTML += `<div class="${type}">[${time}] ${message}</div>`;
+            console.log(message);
+        }
+
+        function clearResult() {
+            document.getElementById('result').innerHTML = '<div class="info">Cleared. Ready for new tests.</div>';
+        }
+
+        async function testHealth() {
+            log('🔄 Testing /api/health...', 'info');
+            try {
+                const response = await fetch('/api/health');
+                log(`Response status: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log('✅ Health check SUCCESS: ' + JSON.stringify(data), 'success');
+            } catch (error) {
+                log('❌ Health check FAILED: ' + error.message, 'error');
+            }
+        }
+
+        async function testCollection() {
+            log('🔄 Testing /api/collection...', 'info');
+            try {
+                const response = await fetch('/api/collection');
+                log(`Response status: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                log('✅ Collection SUCCESS: ' + JSON.stringify(data), 'success');
+            } catch (error) {
+                log('❌ Collection FAILED: ' + error.message, 'error');
+            }
+        }
+
+        async function testUpload() {
+            log('🔄 Testing /api/upload with POST...', 'info');
+            try {
+                const formData = new FormData();
+                formData.append('test', 'emergency_test_data');
+                formData.append('name', 'Emergency Test');
+
+                log('📤 Sending FormData with test data...', 'info');
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                log(`Response status: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}. Response: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                log('✅ Upload SUCCESS: ' + JSON.stringify(data, null, 2), 'success');
+                
+                if (data.data && data.data.imageUrl) {
+                    log('🖼️ Generated image URL: ' + data.data.imageUrl.substring(0, 100) + '...', 'info');
+                }
+            } catch (error) {
+                log('❌ Upload FAILED: ' + error.message, 'error');
+            }
+        }
+
+        async function testMain() {
+            log('🔄 Testing main page (/)...', 'info');
+            try {
+                const response = await fetch('/');
+                log(`Response status: ${response.status} ${response.statusText}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                const size = text.length;
+                log(`✅ Main page SUCCESS: received ${size} bytes of HTML`, 'success');
+            } catch (error) {
+                log('❌ Main page FAILED: ' + error.message, 'error');
+            }
+        }
+
+        // Auto test on load
+        window.onload = function() {
+            log('🚀 Emergency test page loaded. Server should be running on port 3000.', 'info');
+            log('📝 Available tests: Health, Collection, Upload, Main Page', 'info');
+            testHealth();
+        };
+    </script>
+</body>
+</html>

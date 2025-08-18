@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Статус NFT Системы</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .status-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border-left: 5px solid #4CAF50;
+        }
+        .status-error {
+            border-left-color: #f44336;
+        }
+        .status-warning {
+            border-left-color: #ff9800;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .btn-warning {
+            background: #ff9800;
+        }
+        .btn-danger {
+            background: #f44336;
+        }
+        .log {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+        .online { color: #4CAF50; }
+        .offline { color: #f44336; }
+        .warning { color: #ff9800; }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 NFT Система - Статус в Реальном Времени</h1>
+        
+        <div class="status-card">
+            <h3>🌐 Статус Сервера</h3>
+            <p id="server-status" class="pulse">🔍 Проверяем...</p>
+            <p><strong>URL:</strong> <a href="http://localhost:3000" target="_blank" style="color: #ffeb3b;">http://localhost:3000</a></p>
+        </div>
+
+        <div class="status-card">
+            <h3>🔧 Компоненты Системы</h3>
+            <div id="components">
+                <p>🟡 Node.js: <span id="nodejs-status">Проверяем...</span></p>
+                <p>🟡 Порт 3000: <span id="port-status">Проверяем...</span></p>
+                <p>🟡 Тестовый сервер: <span id="test-server-status">Проверяем...</span></p>
+            </div>
+        </div>
+
+        <div class="status-card">
+            <h3>🎮 Управление</h3>
+            <button class="btn" onclick="checkServer()">🔄 Обновить Статус</button>
+            <button class="btn" onclick="openNFTApp()">🚀 Открыть NFT Приложение</button>
+            <button class="btn btn-warning" onclick="showInstructions()">📋 Инструкции</button>
+        </div>
+
+        <div class="status-card" id="instructions" style="display: none;">
+            <h3>📋 Инструкции по Запуску</h3>
+            <ol>
+                <li><strong>БЫСТРАЯ-ПРОВЕРКА.bat</strong> - дважды кликните для автоматической проверки</li>
+                <li><strong>ПОЛНАЯ-ПРОВЕРКА.bat</strong> - полная диагностика системы</li>
+                <li><strong>ТЕСТ-СЕРВЕР.bat</strong> - запуск простого тестового сервера</li>
+                <li><strong>Ручной запуск:</strong> откройте терминал и введите <code>node test-server.js</code></li>
+            </ol>
+        </div>
+
+        <div class="log" id="log">
+            <div>📝 Лог проверок:</div>
+            <div id="log-content">Ожидание проверок...</div>
+        </div>
+    </div>
+
+    <script>
+        let checkCount = 0;
+        
+        function log(message) {
+            const logContent = document.getElementById('log-content');
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `<br>[${timestamp}] ${message}`;
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        async function checkServer() {
+            checkCount++;
+            log(`🔍 Проверка #${checkCount} начата`);
+            
+            const serverStatus = document.getElementById('server-status');
+            serverStatus.className = 'pulse offline';
+            serverStatus.textContent = '🔍 Проверяем сервер...';
+
+            try {
+                const response = await fetch('http://localhost:3000', { 
+                    method: 'GET',
+                    cache: 'no-cache',
+                    timeout: 5000 
+                });
+                
+                if (response.ok) {
+                    serverStatus.className = 'online';
+                    serverStatus.innerHTML = '✅ Сервер работает!';
+                    log('✅ Сервер отвечает нормально');
+                    
+                    // Проверяем содержимое ответа
+                    const text = await response.text();
+                    if (text.includes('NFT')) {
+                        log('✅ NFT приложение загружено');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                serverStatus.className = 'offline';
+                serverStatus.innerHTML = '❌ Сервер не отвечает';
+                log(`❌ Ошибка подключения: ${error.message}`);
+                log('💡 Попробуйте запустить БЫСТРАЯ-ПРОВЕРКА.bat');
+            }
+        }
+
+        function openNFTApp() {
+            log('🚀 Открываем NFT приложение...');
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        function showInstructions() {
+            const instructions = document.getElementById('instructions');
+            instructions.style.display = instructions.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Автоматическая проверка каждые 5 секунд
+        setInterval(checkServer, 5000);
+        
+        // Первая проверка
+        setTimeout(checkServer, 1000);
+        
+        log('📊 Мониторинг начат');
+        log('🔄 Автопроверка каждые 5 секунд');
+    </script>
+</body>
+</html>

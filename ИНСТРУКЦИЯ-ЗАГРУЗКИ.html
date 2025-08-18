@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📤 Инструкция по загрузке NFT файлов</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .upload-demo {
+            background: rgba(255,255,255,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #4CAF50;
+            margin: 20px 0;
+        }
+        .step {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 3px solid #2196F3;
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        .btn-large {
+            padding: 20px 40px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .btn-warning {
+            background: #ff9800;
+        }
+        .btn-info {
+            background: #2196F3;
+        }
+        .highlight {
+            background: rgba(255, 235, 59, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffeb3b;
+            margin: 15px 0;
+        }
+        .drag-drop-demo {
+            border: 3px dashed rgba(255,255,255,0.5);
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.05);
+        }
+        .format-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .format-item {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(76, 175, 80, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📤 Где и как загружать файлы для NFT</h1>
+        
+        <div class="highlight">
+            <h2>🎯 Главное: У вас есть 2 рабочих сервера для загрузки!</h2>
+            <p><strong>Порт 3000:</strong> Тестовый сервер (активно обрабатывает загрузки)</p>
+            <p><strong>Порт 3001:</strong> Основной INSTANT NFT сервер</p>
+        </div>
+
+        <div class="upload-demo">
+            <h2>🚀 Прямые ссылки для загрузки файлов:</h2>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="http://localhost:3000" target="_blank" class="btn btn-large">
+                    📤 Загрузить на порт 3000
+                </a>
+                <a href="http://localhost:3001" target="_blank" class="btn btn-large btn-info">
+                    📤 Загрузить на порт 3001
+                </a>
+            </div>
+        </div>
+
+        <h2>📋 Пошаговая инструкция:</h2>
+
+        <div class="step">
+            <h3>Шаг 1: Откройте NFT приложение</h3>
+            <p>Кликните на одну из кнопок выше или перейдите по ссылкам:</p>
+            <ul>
+                <li><strong>http://localhost:3000</strong> - тестовый сервер</li>
+                <li><strong>http://localhost:3001</strong> - основной сервер</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <h3>Шаг 2: Найдите область загрузки</h3>
+            <p>На странице NFT приложения ищите:</p>
+            <div class="drag-drop-demo">
+                <h3>📁 Перетащите файлы сюда</h3>
+                <p>или</p>
+                <button class="btn">📂 Выбрать файлы</button>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Шаг 3: Выберите файлы для загрузки</h3>
+            <p><strong>Поддерживаемые форматы:</strong></p>
+            <div class="format-list">
+                <div class="format-item">🖼️ JPG</div>
+                <div class="format-item">🖼️ PNG</div>
+                <div class="format-item">🖼️ GIF</div>
+                <div class="format-item">🖼️ WebP</div>
+                <div class="format-item">📄 PDF</div>
+                <div class="format-item">🎵 MP3</div>
+                <div class="format-item">🎬 MP4</div>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>Шаг 4: Способы загрузки</h3>
+            <p><strong>Метод 1:</strong> Перетащите файлы мышкой в область загрузки</p>
+            <p><strong>Метод 2:</strong> Кликните кнопку "Выбрать файлы" и выберите в проводнике</p>
+            <p><strong>Метод 3:</strong> Используйте комбинацию Ctrl+V для вставки из буфера</p>
+        </div>
+
+        <div class="step">
+            <h3>Шаг 5: Что происходит после загрузки</h3>
+            <ul>
+                <li>🤖 Автоматическая генерация описания с помощью ИИ</li>
+                <li>📝 Создание метаданных NFT</li>
+                <li>💾 Сохранение в GitHub репозиторий</li>
+                <li>🔗 Генерация ссылки на NFT</li>
+            </ul>
+        </div>
+
+        <div class="highlight">
+            <h3>💡 Полезные советы:</h3>
+            <ul>
+                <li><strong>Размер файлов:</strong> Рекомендуется до 10 МБ</li>
+                <li><strong>Качество:</strong> Используйте высокое разрешение для изображений</li>
+                <li><strong>Названия:</strong> Давайте файлам понятные имена</li>
+                <li><strong>Тестирование:</strong> Сначала попробуйте на порту 3000</li>
+            </ul>
+        </div>
+
+        <div class="upload-demo">
+            <h2>🔧 Текущий статус серверов:</h2>
+            <p id="server-status">🔍 Проверяем серверы...</p>
+            <button class="btn btn-warning" onclick="checkServers()">🔄 Обновить статус</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <h2>🚀 Готовы начать?</h2>
+            <a href="http://localhost:3000" target="_blank" class="btn btn-large">
+                📤 Начать загрузку NFT
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function checkServers() {
+            const statusElement = document.getElementById('server-status');
+            statusElement.innerHTML = '🔍 Проверяем серверы...';
+            
+            let status3000 = '❌';
+            let status3001 = '❌';
+            
+            try {
+                const response3000 = await fetch('http://localhost:3000');
+                if (response3000.ok) status3000 = '✅';
+            } catch (e) {}
+            
+            try {
+                const response3001 = await fetch('http://localhost:3001');
+                if (response3001.ok) status3001 = '✅';
+            } catch (e) {}
+            
+            statusElement.innerHTML = `
+                <strong>Порт 3000:</strong> ${status3000} ${status3000 === '✅' ? 'Готов к загрузке' : 'Недоступен'}<br>
+                <strong>Порт 3001:</strong> ${status3001} ${status3001 === '✅' ? 'Готов к загрузке' : 'Недоступен'}
+            `;
+        }
+        
+        // Проверяем серверы при загрузке
+        window.addEventListener('load', () => {
+            setTimeout(checkServers, 1000);
+        });
+    </script>
+</body>
+</html>

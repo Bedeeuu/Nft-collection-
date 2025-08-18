@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 NFT Запуск</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.2);
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .btn {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        .instruction {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .file-link {
+            color: #ffeb3b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 NFT Сервер - Запуск</h1>
+        
+        <div class="instruction">
+            <h3>📋 Способы запуска:</h3>
+            
+            <p><strong>1. Самый простой способ:</strong></p>
+            <p>Найдите файл <span class="file-link">ПРОСТО-ЗАПУСК.bat</span> и дважды кликните по нему</p>
+            
+            <p><strong>2. Через командную строку:</strong></p>
+            <p>Нажмите <code>Win + R</code>, введите <code>cmd</code>, затем:</p>
+            <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px;">
+cd "c:\Users\Демид\Documents\GitHub\Nft-collection-"
+node instant-server.js
+            </pre>
+            
+            <p><strong>3. Через файл start.cmd:</strong></p>
+            <p>Дважды кликните по файлу <span class="file-link">start.cmd</span></p>
+            
+            <p><strong>4. Если есть Python:</strong></p>
+            <p>Запустите файл <span class="file-link">запуск.py</span></p>
+        </div>
+        
+        <div style="background: rgba(255,193,7,0.2); padding: 15px; border-radius: 10px; margin: 20px 0;">
+            <h3>⚡ После запуска:</h3>
+            <p>Сервер будет доступен на: <strong>http://localhost:3000</strong></p>
+            <button class="btn" onclick="window.open('http://localhost:3000')">
+                🌐 Открыть NFT приложение
+            </button>
+        </div>
+        
+        <div style="background: rgba(244,67,54,0.2); padding: 15px; border-radius: 10px;">
+            <h3>🆘 Если ничего не работает:</h3>
+            <p>1. Убедитесь, что Node.js установлен</p>
+            <p>2. Откройте терминал в VS Code (Ctrl+Shift+`)</p>
+            <p>3. Введите: <code>node --version</code></p>
+            <p>4. Если Node.js есть, введите: <code>node instant-server.js</code></p>
+        </div>
+    </div>
+    
+    <script>
+        // Проверяем доступность сервера
+        function checkServer() {
+            fetch('http://localhost:3000')
+                .then(response => {
+                    if (response.ok) {
+                        document.body.style.background = 'linear-gradient(135deg, #4CAF50 0%, #45a049 100%)';
+                        document.querySelector('h1').innerHTML = '✅ NFT Сервер Работает!';
+                    }
+                })
+                .catch(() => {
+                    // Сервер не доступен
+                });
+        }
+        
+        // Проверяем каждые 2 секунды
+        setInterval(checkServer, 2000);
+        checkServer();
+    </script>
+</body>
+</html>

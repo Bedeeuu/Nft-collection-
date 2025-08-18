@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Порт 3002 - NFT Загрузка</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.2);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        .btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 20px 40px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Порт 3002 Открыт!</h1>
+        <p style="font-size: 18px;">Сервер загрузки NFT готов к работе!</p>
+        
+        <div style="margin: 30px 0;">
+            <div class="pulse" style="font-size: 60px;">📤</div>
+        </div>
+        
+        <h2>✅ Что вы увидите на порту 3002:</h2>
+        <ul style="text-align: left; max-width: 400px; margin: 0 auto;">
+            <li>📁 Большая область "Перетащите файлы сюда"</li>
+            <li>📂 Кнопка "Выбрать файлы"</li>
+            <li>📊 Прогресс бар загрузки</li>
+            <li>👁️ Предпросмотр загруженных файлов</li>
+            <li>🧪 Кнопка тестирования соединения</li>
+        </ul>
+        
+        <div style="margin: 30px 0;">
+            <a href="http://localhost:3002" target="_blank" class="btn">
+                🚀 Перейти к загрузке NFT
+            </a>
+        </div>
+        
+        <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <h3>📋 Поддерживаемые файлы:</h3>
+            <p>🖼️ Изображения: JPG, PNG, GIF, IMG<br>
+            🎬 Видео: MP4<br>
+            🎵 Аудио: MP3<br>
+            📄 Документы: PDF</p>
+        </div>
+        
+        <p style="opacity: 0.8;">Сервер работает на http://localhost:3002</p>
+    </div>
+</body>
+</html>

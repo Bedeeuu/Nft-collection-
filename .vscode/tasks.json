@@ -1,0 +1,69 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Install Dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"group": "build",
+			"problemMatcher": []
+		},
+		{
+			"label": "Start NFT App",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"app.js"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Simple NFT App",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"simple-app.js"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Test Setup",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"test-setup.js"
+			],
+			"group": "test",
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Emergency Server",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"emergency-server.js"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Start Instant Server",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"instant-server.js"
+			],
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}
