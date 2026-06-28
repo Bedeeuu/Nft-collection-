@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ghostmind.local/schemas/provenance_record.schema.json",
+  "title": "GhostMind Provenance Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "provenance_id",
+    "object_id",
+    "source",
+    "timestamp",
+    "content_hash",
+    "classification",
+    "trust_score",
+    "validation_status"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "provenance_id": { "type": "string" },
+    "object_id": { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["source_type", "source_id"],
+      "properties": {
+        "source_type": { "type": "string", "enum": ["manual", "file", "web", "api", "system", "generated"] },
+        "source_id": { "type": "string" },
+        "source_uri": { "type": ["string", "null"] }
+      }
+    },
+    "owner": { "type": ["string", "null"] },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "classification": { "type": "string", "enum": ["public", "internal", "confidential", "restricted"] },
+    "trust_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "validation_status": { "type": "string", "enum": ["pending", "validated", "quarantined", "rejected"] },
+    "policy_refs": { "type": "array", "items": { "type": "string" } }
+  }
+}
