@@ -1,0 +1,9 @@
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Скажи статус GhostMind Foundation Pack и что делать дальше."
+    }
+  ],
+  "temperature": 0.2
+}
