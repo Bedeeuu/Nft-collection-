@@ -1,6 +1,6 @@
 schema_version: "1.0"
 status_id: ghostmind-foundation-pack-status-v1
-updated_at: "2026-06-27"
+updated_at: "2026-06-28"
 
 foundation_pack:
   docs: pass
@@ -9,7 +9,7 @@ foundation_pack:
   maps: pass
   registry: pass
   validation_script: pass
-  ci_workflow: pending
+  ci_workflow: added_unverified
   observability: pending
   openbao: pending
 
@@ -24,3 +24,8 @@ p0_gate:
 
 phase: P0_ACTIVE
 p1_status: LOCKED
+
+notes:
+  - CI workflow file exists at .github/workflows/foundation.yml
+  - GitHub status-check confirmation is not yet available through the connected API
+  - Server-side infrastructure gates require command evidence from the target machine
