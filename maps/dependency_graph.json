@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "graph_id": "ghostmind-runtime-dependency-graph-v1",
+  "status": "initial",
+  "updated_at": "2026-06-27",
+  "nodes": [
+    { "id": "api_gateway", "type": "service", "criticality": "high" },
+    { "id": "governance_engine", "type": "runtime", "criticality": "critical" },
+    { "id": "replay_engine", "type": "runtime", "criticality": "critical" },
+    { "id": "provenance_runtime", "type": "runtime", "criticality": "critical" },
+    { "id": "rag_runtime", "type": "runtime", "criticality": "high" },
+    { "id": "llm_runtime", "type": "runtime", "criticality": "medium" },
+    { "id": "postgresql", "type": "database", "criticality": "high" },
+    { "id": "vector_db", "type": "database", "criticality": "high" },
+    { "id": "openbao", "type": "vault", "criticality": "critical" },
+    { "id": "prometheus", "type": "observability", "criticality": "medium" },
+    { "id": "loki", "type": "observability", "criticality": "medium" },
+    { "id": "grafana", "type": "observability", "criticality": "medium" }
+  ],
+  "edges": [
+    { "from": "api_gateway", "to": "governance_engine", "relationship": "authorizes_requests" },
+    { "from": "governance_engine", "to": "replay_engine", "relationship": "records_decisions" },
+    { "from": "rag_runtime", "to": "provenance_runtime", "relationship": "validates_knowledge" },
+    { "from": "rag_runtime", "to": "vector_db", "relationship": "retrieves_embeddings" },
+    { "from": "rag_runtime", "to": "llm_runtime", "relationship": "provides_context" },
+    { "from": "replay_engine", "to": "postgresql", "relationship": "stores_replay_metadata" },
+    { "from": "provenance_runtime", "to": "postgresql", "relationship": "stores_provenance_metadata" },
+    { "from": "api_gateway", "to": "openbao", "relationship": "reads_runtime_secrets_via_policy" },
+    { "from": "prometheus", "to": "api_gateway", "relationship": "scrapes_metrics" },
+    { "from": "prometheus", "to": "replay_engine", "relationship": "scrapes_metrics" },
+    { "from": "prometheus", "to": "governance_engine", "relationship": "scrapes_metrics" },
+    { "from": "loki", "to": "api_gateway", "relationship": "collects_logs" },
+    { "from": "grafana", "to": "prometheus", "relationship": "visualizes_metrics" },
+    { "from": "grafana", "to": "loki", "relationship": "visualizes_logs" }
+  ],
+  "forbidden_edges": [
+    { "from": "llm_runtime", "to": "openbao", "reason": "LLM must never access secrets" },
+    { "from": "agent", "to": "openbao", "reason": "agents must not access vault directly" },
+    { "from": "document_upload", "to": "vector_db", "reason": "documents require quarantine and provenance validation" }
+  ]
+}
