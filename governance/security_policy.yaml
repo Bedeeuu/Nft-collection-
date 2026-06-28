@@ -1,0 +1,102 @@
+schema_version: "1.0"
+policy_id: ghostmind-security-policy-v1
+status: canonical_draft
+owner: ghostmind-core
+updated_at: "2026-06-27"
+
+principles:
+  - expose_nothing_directly
+  - trust_no_document
+  - vault_every_secret
+  - replay_every_action
+  - validate_every_tool_call
+
+defaults:
+  authorization: deny
+  external_network_access: deny
+  document_ingestion: quarantine_required
+  replay_required: true
+  provenance_required: true
+  secret_storage: vault_only
+
+classifications:
+  public:
+    retrieval_allowed: true
+    governance_required: false
+  internal:
+    retrieval_allowed: true
+    governance_required: true
+  confidential:
+    retrieval_allowed: restricted
+    governance_required: true
+  restricted:
+    retrieval_allowed: explicit_approval_only
+    governance_required: true
+
+vault:
+  provider: OpenBao
+  required_for:
+    - oauth_tokens
+    - api_keys
+    - jwt_secrets
+    - database_credentials
+    - service_tokens
+  forbidden_locations:
+    - source_code
+    - committed_config
+    - logs
+    - vector_db
+    - documentation
+
+rag:
+  ingestion_pipeline:
+    - upload
+    - quarantine
+    - scan
+    - provenance_validation
+    - classification
+    - embedding
+    - retrieval
+  direct_embedding_allowed: false
+  prompt_injection_scan_required: true
+  provenance_required: true
+
+execution:
+  governance_required_for:
+    - tool_call
+    - agent_action
+    - external_api_call
+    - state_change
+    - document_ingestion
+  replay_required_for:
+    - state_change
+    - governance_decision
+    - tool_call
+    - agent_action
+    - rag_retrieval
+
+agents:
+  manifest_required: true
+  direct_vault_access: false
+  bypass_governance: false
+  hidden_activity: false
+
+observability:
+  required:
+    - metrics
+    - logs
+    - healthcheck
+  security_events:
+    - authentication_failure
+    - authorization_denial
+    - policy_violation
+    - secret_scan_failure
+    - replay_integrity_failure
+    - provenance_failure
+
+incident_response:
+  replay_hash_mismatch: critical
+  secret_in_repository: critical
+  governance_bypass: critical
+  unvalidated_document_indexed: high
+  missing_observability: high
