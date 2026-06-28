@@ -1,0 +1,82 @@
+schema_version: "1.0"
+registry_id: ghostmind-services-registry-v1
+status: initial
+updated_at: "2026-06-27"
+
+services:
+  - service_id: api_gateway
+    name: API Gateway
+    owner: ghostmind-core
+    status: design
+    orl: 2
+    dependencies:
+      - governance_engine
+      - openbao
+    criticality: high
+
+  - service_id: governance_engine
+    name: Governance Engine
+    owner: ghostmind-core
+    status: design
+    orl: 3
+    dependencies:
+      - replay_engine
+      - security_policy
+    criticality: critical
+
+  - service_id: replay_engine
+    name: Replay Engine
+    owner: ghostmind-core
+    status: design
+    orl: 4
+    dependencies:
+      - postgresql
+    criticality: critical
+
+  - service_id: provenance_runtime
+    name: Provenance Runtime
+    owner: ghostmind-core
+    status: design
+    orl: 3
+    dependencies:
+      - postgresql
+      - security_policy
+    criticality: critical
+
+  - service_id: rag_runtime
+    name: RAG Runtime
+    owner: ghostmind-core
+    status: design
+    orl: 3
+    dependencies:
+      - provenance_runtime
+      - vector_db
+      - llm_runtime
+    criticality: high
+
+  - service_id: llm_runtime
+    name: Local LLM Runtime
+    owner: ghostmind-core
+    status: design
+    orl: 3
+    dependencies: []
+    criticality: medium
+
+  - service_id: openbao
+    name: OpenBao Vault
+    owner: security
+    status: planned
+    orl: 2
+    dependencies: []
+    criticality: critical
+
+  - service_id: observability_stack
+    name: Prometheus Loki Grafana
+    owner: operations
+    status: planned
+    orl: 2
+    dependencies:
+      - prometheus
+      - loki
+      - grafana
+    criticality: high
