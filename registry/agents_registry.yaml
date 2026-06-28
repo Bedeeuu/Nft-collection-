@@ -1,0 +1,65 @@
+schema_version: "1.0"
+registry_id: ghostmind-agents-registry-v1
+status: initial
+updated_at: "2026-06-27"
+
+policy:
+  agents_are_executors_not_authorities: true
+  governance_required: true
+  replay_required: true
+  direct_vault_access: false
+
+agents:
+  - agent_id: od_core
+    name: OD Core
+    internal_name: Optimus Dolboebius
+    technical_name: Operational Decision Core
+    role: decision_engine
+    owner: ghostmind-core
+    status: canonical
+    orl: 3
+    permissions:
+      - analyze_context
+      - recommend_actions
+    forbidden:
+      - direct_vault_access
+      - bypass_governance
+      - hidden_execution
+
+  - agent_id: rag_agent
+    name: RAG Agent
+    role: knowledge_retrieval
+    owner: ghostmind-core
+    status: planned
+    orl: 2
+    permissions:
+      - retrieve_validated_context
+    forbidden:
+      - index_unvalidated_documents
+      - bypass_provenance
+
+  - agent_id: security_monitoring_agent
+    name: Security Monitoring Agent
+    role: security_monitoring
+    owner: security
+    status: planned
+    orl: 2
+    permissions:
+      - read_security_metrics
+      - generate_security_reports
+    forbidden:
+      - modify_policies_without_approval
+      - access_vault_secrets
+
+  - agent_id: governance_audit_agent
+    name: Governance Audit Agent
+    role: governance_audit
+    owner: ghostmind-core
+    status: planned
+    orl: 2
+    permissions:
+      - read_governance_decisions
+      - detect_policy_violations
+    forbidden:
+      - approve_own_actions
+      - bypass_replay
