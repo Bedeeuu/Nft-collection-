@@ -1,0 +1,76 @@
+schema_version: "1.0"
+registry_id: ghostmind-canonical-terms-v1
+status: initial
+updated_at: "2026-06-27"
+
+terms:
+  - term: Runtime
+    definition: Continuous lifecycle of observation, validation, governance, execution and replay.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - Governance
+      - Replay
+      - Observability
+
+  - term: Governance
+    definition: Runtime layer that decides whether an action is allowed, denied, restricted or escalated.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - Policy
+      - Authorization
+      - Replay
+
+  - term: Replay
+    definition: Append-only record of state-changing actions that enables reconstruction and audit.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - Event
+      - Hash Chain
+      - Audit
+
+  - term: Provenance
+    definition: Metadata describing the origin, integrity, classification and trust state of knowledge.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - RAG
+      - Trust Score
+      - Classification
+
+  - term: RAG
+    definition: Retrieval-Augmented Generation layer where knowledge stays outside the model and is supplied as governed context.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - Provenance
+      - VectorDB
+      - Context
+
+  - term: OD
+    definition: Internal friendly name for the Operational Decision Core. Internal name Optimus Dolboebius; technical name Operational Decision Core; role decision_engine.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - Decision Engine
+      - Governance
+
+  - term: Foundation Pack
+    definition: Minimum executable engineering artifacts required before P0 completion.
+    owner: ghostmind-core
+    status: canonical
+    related:
+      - Schemas
+      - Governance
+      - Registry
+      - Maps
+
+  - term: ORL
+    definition: Operational Readiness Level from 0 to 9 measuring maturity of components.
+    owner: operations
+    status: canonical
+    related:
+      - Maturity
+      - Compliance
