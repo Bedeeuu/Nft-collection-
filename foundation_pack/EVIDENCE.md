@@ -1,6 +1,6 @@
 # GhostMind Foundation Pack Evidence
 
-Date: 2026-06-27
+Date: 2026-06-28
 
 This file tracks factual evidence for P0 completion.
 
@@ -75,18 +75,27 @@ Evidence:
 
 ### CI Workflow
 
-Status: PENDING
+Status: ADDED_UNVERIFIED
 
-Reason: workflow file creation still pending.
+Evidence:
+
+- `.github/workflows/foundation.yml`
+- commit: `a0feba4a0969701087bf809d3e83af86380e6adf`
+
+Note: GitHub status-check confirmation was not available through the connected API at the time of this update.
 
 ### Runtime Infrastructure Gates
 
 Status: PENDING
 
-Required:
+Required command evidence from the target server:
 
-- OpenBao proof
-- AppArmor proof
-- Rootless container proof
-- WireGuard proof
-- Observability proof
+- `bao version`
+- `aa-status`
+- `docker info` or `podman info`
+- `systemctl status wg-quick@wg0`
+- `systemctl status prometheus`
+- `systemctl status grafana-server`
+- `systemctl status loki`
+
+These gates must not be marked PASS without real command output.
