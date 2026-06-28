@@ -1,0 +1,26 @@
+schema_version: "1.0"
+status_id: ghostmind-foundation-pack-status-v1
+updated_at: "2026-06-27"
+
+foundation_pack:
+  docs: pass
+  schemas: pass
+  governance: pass
+  maps: pass
+  registry: pass
+  validation_script: pass
+  ci_workflow: pending
+  observability: pending
+  openbao: pending
+
+p0_gate:
+  G1_OpenBao: pending
+  G2_n8n_Upgrade: pending
+  G3_AppArmor: pending
+  G4_Rootless_Containers: pending
+  G5_WireGuard: pending
+  G6_Foundation_Pack: partial_pass
+  G7_Observability: pending
+
+phase: P0_ACTIVE
+p1_status: LOCKED
