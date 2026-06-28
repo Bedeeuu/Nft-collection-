@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ghostmind.local/schemas/replay_packet.schema.json",
+  "title": "GhostMind Replay Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "timestamp",
+    "actor",
+    "action",
+    "input_state",
+    "decision_state",
+    "result_state",
+    "previous_hash",
+    "event_hash"
+  ],
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0" },
+    "event_id": { "type": "string", "minLength": 8 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "actor": {
+      "type": "object",
+      "required": ["actor_type", "actor_id"],
+      "properties": {
+        "actor_type": { "type": "string", "enum": ["user", "agent", "service", "system"] },
+        "actor_id": { "type": "string" }
+      }
+    },
+    "action": {
+      "type": "object",
+      "required": ["action_type", "target"],
+      "properties": {
+        "action_type": { "type": "string" },
+        "target": { "type": "string" },
+        "tool_id": { "type": ["string", "null"] }
+      }
+    },
+    "input_state": { "type": "object" },
+    "runtime_state": { "type": "object" },
+    "decision_state": { "type": "object" },
+    "result_state": { "type": "object" },
+    "previous_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "event_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "provenance_refs": { "type": "array", "items": { "type": "string" } },
+    "policy_refs": { "type": "array", "items": { "type": "string" } }
+  }
+}
